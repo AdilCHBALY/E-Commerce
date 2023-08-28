@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Store } from "@prisma/client"
 import { Trash } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import { Form, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
-import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
+import { Form ,FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
 interface SettingsFormProps{
