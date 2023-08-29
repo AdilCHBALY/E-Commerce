@@ -4,7 +4,7 @@
 import * as z from "zod"
 import Heading from "@/components/ui/Heading"
 import { Button } from "@/components/ui/button"
-import { Store } from "@prisma/client"
+import { Color, Size } from "@prisma/client"
 import { Trash } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { useForm } from "react-hook-form"
@@ -16,21 +16,20 @@ import { toast } from "react-hot-toast"
 import axios from "axios"
 import { useParams, useRouter } from "next/navigation"
 import AlertModal from "@/components/modals/AlertModal"
-import ApiAlert from "@/components/ui/ApiAlert"
 import { useOrigin } from "@/hooks/useOrigin"
 
-interface SettingsFormProps{
-    initialData:Store
+interface ColorFormProps{
+    initialData:Color | null
 }
 
 const formSchema = z.object({
-    name:z.string().min(2)
+    name:z.string().min(2),
+    value:z.string().min(1)
 })
 
+type ColorFormValues=z.infer<typeof formSchema>
 
-type SettingsFormValues=z.infer<typeof formSchema>
-
-const SettingsForm : React.FC<SettingsFormProps> = ({
+const ColorForm : React.FC<ColorFormProps> = ({
     initialData
 }) => {
     const params = useParams()
@@ -38,18 +37,31 @@ const SettingsForm : React.FC<SettingsFormProps> = ({
     const [open,setOpen]=useState(false)
     const [loading,setLoading] = useState(false)
 
+    const title = initialData ? "Edit Color" : "Create Color"
+    const description = initialData ? "Edit a Color" : "Add a Color"
+    const toastMessage = initialData ? "Color updated" : "Color Created"
+    const action = initialData ? "Save Changes" : "Create"
 
-    const form = useForm<SettingsFormValues>({
+
+    const form = useForm<ColorFormValues>({
         resolver:zodResolver(formSchema),
-        defaultValues : initialData
+        defaultValues : initialData || {
+            name : '',
+            value : ''
+        }
     })
 
-    const onSubmit=async(data:SettingsFormValues)=>{
+    const onSubmit=async(data:ColorFormValues)=>{
         try {
             setLoading(true)
-            await axios.patch(`/api/stores/${params.storeId}`,data)
+            if(initialData){
+                await axios.patch(`/api/${params.storeId}/colors/${params.colorId}`,data)
+            }else{
+                await axios.post(`/api/${params.storeId}/colors/`,data)
+            }
             router.refresh()
-            toast.success("Store Updated")
+            router.push(`/${params.storeId}/colors/`)
+            toast.success(toastMessage)
         } catch (error) {
             toast.error("Something went wrong")
         } finally{
@@ -60,12 +72,12 @@ const SettingsForm : React.FC<SettingsFormProps> = ({
     const onDelete = async()=>{
         try {
             setLoading(true)
-            await axios.delete(`/api/stores/${params.storeId}`)
+            await axios.delete(`/api/${params.storeId}/colors/${params.colorId}`)
             router.refresh()
-            router.push('/')
-            toast.success("Store Deleted")
+            router.push(`/${params.storeId}/colors`)
+            toast.success("Color Deleted")
         } catch (error) {
-            toast.error("Make sure you removed the products and category in the store")
+            toast.error("Make sure you removed all products using this color")
         }finally{
             setLoading(false)
             setOpen(false)
@@ -84,17 +96,20 @@ const SettingsForm : React.FC<SettingsFormProps> = ({
             />
             <div className="flex items-center justify-between">
                 <Heading 
-                    title="Settings"
-                    subtitle="Manage store details"
+                    title={title}
+                    subtitle={description}
                 />
-                <Button
-                    disabled={loading}
-                    variant='destructive'
-                    size="sm"
-                    onClick={()=>setOpen(true)}
-                >
-                    <Trash className="h-4 w-4" />
-                </Button>
+                {initialData && (
+                    <Button
+                        disabled={loading}
+                        variant='destructive'
+                        size="sm"
+                        onClick={()=>setOpen(true)}
+                    >
+                        <Trash className="h-4 w-4" />
+                    </Button>
+                )}
+                
             </div>
             <Separator />
             <Form {...form}>
@@ -109,7 +124,26 @@ const SettingsForm : React.FC<SettingsFormProps> = ({
                                     <FormControl>
                                         <Input
                                             disabled={loading}
-                                            placeholder="Store name"
+                                            placeholder="Color Name"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="value"
+                            render={({field})=>(
+                                <FormItem>
+                                    <FormLabel>
+                                        Value 
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={loading}
+                                            placeholder="Color Value"
                                             {...field}
                                         />
                                     </FormControl>
@@ -119,18 +153,13 @@ const SettingsForm : React.FC<SettingsFormProps> = ({
                         />
                     </div>
                     <Button type="submit" className="ml-auto" disabled={loading}>
-                        Save Changes
+                        {action}
                     </Button>
                 </form>
             </Form>
             <Separator />
-            <ApiAlert
-                title="NEXT_PUBLIC_API_URL"
-                description={`${origin}/api/${params.storeId}`}
-                variant="public"
-            />
         </>
     )
 }
 
-export default SettingsForm
+export default ColorForm
