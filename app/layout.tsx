@@ -1,13 +1,12 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import ModalProvider from '@/providers/modal-provider'
-import prismadb from '@/lib/prismadb'
 import ToasterProvider from '@/providers/ToastProvider'
 
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Poppins({ subsets: ['latin'],weight: ["400", "500", "600", "700", "800", "900"], })
 
 export const metadata: Metadata = {
   title: 'Create Next App',
