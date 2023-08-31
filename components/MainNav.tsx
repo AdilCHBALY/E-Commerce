@@ -69,7 +69,7 @@ const MainNav = ({className,...props}:React.HTMLAttributes<HTMLElement>) => {
                     key={route.href}
                     href={route.href} 
                     className={cn("text-sm group flex items-center justify-center gap-x-1 font-medium transition-colors hover:text-primary",
-                    route.active ? "text-black dark:text-white" :"text-muted-foreground"
+                    route.active ? "text-primary dark:text-white" :"text-muted-foreground"
                     )}
                 >
                     <div className={cn(`group-hover:translate-y-[-10%] transition`,
