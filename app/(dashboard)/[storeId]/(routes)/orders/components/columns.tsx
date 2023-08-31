@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import CellAction from "./CellAction"
+import { PackageX,PackageCheck } from "lucide-react"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -35,6 +35,11 @@ export const columns: ColumnDef<OrderColumn>[] = [
     {
         accessorKey: "isPaid",
         header: "Status",
+        cell:({row})=>(
+            <div className="mx-auto">
+                {row.original.isPaid ? <PackageCheck className="text-emerald-500"  size={28} /> : <PackageX className="text-rose-500"  size={28}/>}
+            </div>
+        )
     },
     {
         accessorKey: "createdAt",
