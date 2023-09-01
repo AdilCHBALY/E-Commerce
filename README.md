@@ -67,8 +67,7 @@ npm run dev
 
 ## Demo
 
-- Email : t21547329@gmail.com
-
+Connect with Google Account 
 
 https://e-commerce-5u75jxpd1-adilchbaly.vercel.app
 
